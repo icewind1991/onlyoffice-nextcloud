@@ -184,6 +184,7 @@ class EditorController extends Controller {
      *
      * @param string $name - file name
      * @param string $dir - folder path
+     * @param int $fileId - identifier of the file that is contained in target dir
      * @param string $shareToken - access token
      *
      * @return array
@@ -191,7 +192,7 @@ class EditorController extends Controller {
      * @NoAdminRequired
      * @PublicPage
      */
-    public function create($name, $dir, $shareToken = null) {
+    public function create($name, $dir = null, $fileId = null, $shareToken = null) {
         $this->logger->debug("Create: $name", ["app" => $this->appName]);
 
         if (empty($shareToken) && !$this->config->isUserAllowedToUse()) {
@@ -219,7 +220,18 @@ class EditorController extends Controller {
             }
         }
 
-        $folder = $userFolder->get($dir);
+        if (!empty($dir)) {
+            $folder = $userFolder->get($dir);
+        } else {
+            list ($file, $error, $share) = empty($shareToken) ? $this->getFile($userId, $fileId) : $this->fileUtility->getFileByToken($fileId, $shareToken);
+
+            if (isset($error)) {
+                $this->logger->error("Create: $fileId $error", ["app" => $this->appName]);
+                return ["error" => $error];
+            }
+
+            $folder = $file->getParent();
+        }
 
         if ($folder === null) {
             $this->logger->error("Folder for file creation was not found: $dir", ["app" => $this->appName]);

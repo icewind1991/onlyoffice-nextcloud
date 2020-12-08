@@ -139,6 +139,7 @@
                         "onRequestHistory": OCA.Onlyoffice.onRequestHistory,
                         "onRequestHistoryData": OCA.Onlyoffice.onRequestHistoryData,
                         "onDocumentReady": OCA.Onlyoffice.onDocumentReady,
+                        "onRequestCreateNew": OCA.Onlyoffice.onRequestCreateNew,
                     };
 
                     if (!OCA.Onlyoffice.version) {
@@ -417,6 +418,44 @@
                 OCA.Onlyoffice.docEditor.setRevisedFile(response);
             });
     };
+
+    OCA.Onlyoffice.onRequestCreateNew = function () {
+        var shareToken = OCA.Onlyoffice.shareToken != "" ? OCA.Onlyoffice.shareToken : null;
+        var fileId = OCA.Onlyoffice.fileId != "" ? OCA.Onlyoffice.fileId : null;
+        var name = "";
+
+        switch (OCA.Onlyoffice.documentType) {
+            case "text":
+                name = t(OCA.Onlyoffice.AppName, "Document") + ".docx";
+                break;
+            case "spreadsheet":
+                name = t(OCA.Onlyoffice.AppName, "Spreadsheet") + ".xlsx";
+                break;
+            case "presentation":
+                name = t(OCA.Onlyoffice.AppName, "Presentation") + ".pptx";
+                break;
+        }
+
+        var createData = {
+            name: name
+        }
+        if (fileId) {
+            createData.fileId = fileId;
+        }
+        if (shareToken) {
+            createData.shareToken = shareToken;
+        }
+
+        $.post(OC.generateUrl("apps/" + OCA.Onlyoffice.AppName + "/ajax/new"),
+            createData,
+            function onSuccess(response) {
+                if (response.error) {
+                    OCP.Toast.error(response.error);
+                    return;
+                }
+            }
+        );
+    }
 
     $(document).ready(OCA.Onlyoffice.InitEditor);
 
