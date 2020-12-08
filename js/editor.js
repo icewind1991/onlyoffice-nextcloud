@@ -453,6 +453,8 @@
                     OCP.Toast.error(response.error);
                     return;
                 }
+
+                OCA.Onlyoffice.OpenEditor(response.id, "", "", 0, null, shareToken);
             }
         );
     }

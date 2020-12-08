@@ -66,7 +66,7 @@
         );
     };
 
-    OCA.Onlyoffice.OpenEditor = function (fileId, fileDir, fileName, version, winEditor) {
+    OCA.Onlyoffice.OpenEditor = function (fileId, fileDir, fileName, version, winEditor, shareToken) {
         var filePath = "";
         if (fileName) {
             filePath = fileDir.replace(new RegExp("\/$"), "") + "/" + fileName;
@@ -77,10 +77,10 @@
                 filePath: filePath
             });
 
-        if ($("#isPublic").val()) {
+        if ($("#isPublic").val() || shareToken) {
             url = OC.generateUrl("apps/" + OCA.Onlyoffice.AppName + "/s/{shareToken}?fileId={fileId}",
                 {
-                    shareToken: encodeURIComponent($("#sharingToken").val()),
+                    shareToken: shareToken ? shareToken : encodeURIComponent($("#sharingToken").val()),
                     fileId: fileId
                 });
         }

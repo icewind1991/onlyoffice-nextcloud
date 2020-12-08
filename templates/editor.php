@@ -20,6 +20,7 @@
     style("onlyoffice", "editor");
     script("onlyoffice", "desktop");
     script("onlyoffice", "editor");
+    script("onlyoffice", "main");
     if (!empty($_["directToken"])) {
         script("onlyoffice", "directeditor");
     }
