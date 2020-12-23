@@ -454,7 +454,20 @@
                     return;
                 }
 
-                OCA.Onlyoffice.OpenEditor(response.id, "", "", 0, null, shareToken);
+                var url = OC.generateUrl("/apps/" + OCA.Onlyoffice.AppName + "/{fileId}",
+                {
+                    fileId: response.id
+                });
+
+                if (shareToken) {
+                    url = OC.generateUrl("apps/" + OCA.Onlyoffice.AppName + "/s/{shareToken}?fileId={fileId}",
+                        {
+                            shareToken: shareToken,
+                            fileId: response.id
+                        });
+                }
+
+                window.open(url, "_blank");
             }
         );
     }
