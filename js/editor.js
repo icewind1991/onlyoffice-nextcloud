@@ -426,6 +426,9 @@
         var fileId = OCA.Onlyoffice.fileId;
         var name = "";
 
+        var loaderUrl = OCA.Onlyoffice.Desktop ? "" : OC.generateUrl("apps/" + OCA.Onlyoffice.AppName + "/loader");
+        var winEditor = window.open(loaderUrl);
+
         switch (OCA.Onlyoffice.documentType) {
             case "text":
                 name = t(OCA.Onlyoffice.AppName, "Document") + ".docx";
@@ -447,6 +450,9 @@
             createData,
             function onSuccess(response) {
                 if (response.error) {
+                    if (winEditor) {
+                        winEditor.close();
+                    }
                     OCP.Toast.error(response.error);
                     return;
                 }
@@ -456,7 +462,9 @@
                     fileId: response.id
                 });
 
-                window.open(url, "_blank");
+                winEditor.location.href = url;
+
+                OCP.Toast.success(t(OCA.Onlyoffice.AppName, "File created"));
             }
         );
     }
