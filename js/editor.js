@@ -139,7 +139,6 @@
                         "onRequestHistory": OCA.Onlyoffice.onRequestHistory,
                         "onRequestHistoryData": OCA.Onlyoffice.onRequestHistoryData,
                         "onDocumentReady": OCA.Onlyoffice.onDocumentReady,
-                        "onRequestCreateNew": OCA.Onlyoffice.onRequestCreateNew,
                     };
 
                     if (!OCA.Onlyoffice.version) {
@@ -150,6 +149,10 @@
                         config.events.onAppReady = function () {
                             OCA.Onlyoffice.docEditor.showMessage(t(OCA.Onlyoffice.AppName, "You are using public demo ONLYOFFICE Document Server. Please do not store private sensitive data."));
                         };
+                    }
+
+                    if (!OCA.Onlyoffice.shareToken) {
+                        config.events.onRequestCreateNew = OCA.Onlyoffice.onRequestCreateNew;
                     }
 
                     if (OCA.Onlyoffice.inframe && !OCA.Onlyoffice.shareToken
@@ -420,8 +423,7 @@
     };
 
     OCA.Onlyoffice.onRequestCreateNew = function () {
-        var shareToken = OCA.Onlyoffice.shareToken != "" ? OCA.Onlyoffice.shareToken : null;
-        var fileId = OCA.Onlyoffice.fileId != "" ? OCA.Onlyoffice.fileId : null;
+        var fileId = OCA.Onlyoffice.fileId;
         var name = "";
 
         switch (OCA.Onlyoffice.documentType) {
@@ -437,13 +439,8 @@
         }
 
         var createData = {
-            name: name
-        }
-        if (fileId) {
-            createData.fileId = fileId;
-        }
-        if (shareToken) {
-            createData.shareToken = shareToken;
+            name: name,
+            fileId: fileId
         }
 
         $.post(OC.generateUrl("apps/" + OCA.Onlyoffice.AppName + "/ajax/new"),
@@ -458,14 +455,6 @@
                 {
                     fileId: response.id
                 });
-
-                if (shareToken) {
-                    url = OC.generateUrl("apps/" + OCA.Onlyoffice.AppName + "/s/{shareToken}?fileId={fileId}",
-                        {
-                            shareToken: shareToken,
-                            fileId: response.id
-                        });
-                }
 
                 window.open(url, "_blank");
             }
