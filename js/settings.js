@@ -305,6 +305,33 @@
                 }
             });
         });
+
+        $("#onlyofficeAddTemplate").change(function () {
+            var file = this.files[0];
+            var data = new FormData();
+
+            data.append("file", file);
+
+            $(".section-onlyoffice").addClass("icon-loading");
+            $.ajax({
+                method: "POST",
+                url: OC.generateUrl("apps/" + OCA.Onlyoffice.AppName + "/ajax/settings/template"),
+                data: data,
+                processData: false,
+                contentType: false,
+                success: function onSuccess(response) {
+                    $(".section-onlyoffice").removeClass("icon-loading");
+                    if (response) {
+                        if (response.error) {
+                            OCP.Toast.error(response.error);
+                            return;
+                        }
+
+                        OCP.Toast.success(t(OCA.Onlyoffice.AppName, "Template successfully added"));
+                    }
+                }
+            });
+        });
     });
 
 })(jQuery, OC);

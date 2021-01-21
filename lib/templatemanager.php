@@ -19,6 +19,7 @@
 
 namespace OCA\Onlyoffice;
 
+use OCP\Files\Folder;
 
 /**
  * Template manager
@@ -47,6 +48,22 @@ class TemplateManager {
 
         $template = file_get_contents($templatePath);
         return $template;
+    }
+
+    /**
+     * Get global template directory
+     *
+     * @return Folder
+     */
+    public static function GetGlobalTemplateDir() {
+        $rootFolder = \OC::$server->getRootFolder();
+
+        $appData = $rootFolder->get("appdata_" . \OC::$server->getConfig()->GetSystemValue("instanceid", null));
+
+        $appDir = $appData->nodeExists("onlyoffice") ? $appData->get("onlyoffice") : $appData->newFolder("onlyoffice");
+        $templateDir = $appDir->nodeExists("template") ? $appDir->get("template") : $appDir->newFolder("template");
+
+        return $templateDir;
     }
 
     /**

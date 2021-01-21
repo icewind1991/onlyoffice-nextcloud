@@ -311,3 +311,13 @@
     <p><button id="onlyofficeWatermarkSave" class="button"><?php p($l->t("Save")) ?></button></p>
 
 </div>
+
+<div class="section section-onlyoffice section-onlyoffice-templates">
+
+    <h3>
+        <?php p($l->t("Global templates")) ?>
+        <input id="onlyofficeAddTemplate" type="file" class="hidden-visually" />
+        <label for="onlyofficeAddTemplate" class="icon-add" title="<?php p($l->t('Add a new template')) ?>"></label>
+    </h3>
+
+</div>
