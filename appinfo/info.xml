@@ -32,6 +32,8 @@
         <nextcloud min-version="18" max-version="20"/>
     </dependencies>
     <settings>
+        <personal>OCA\Onlyoffice\PersonalSettings</personal>
+        <personal-section>OCA\Onlyoffice\AdminSection</personal-section>
         <admin>OCA\Onlyoffice\AdminSettings</admin>
         <admin-section>OCA\Onlyoffice\AdminSection</admin-section>
     </settings>

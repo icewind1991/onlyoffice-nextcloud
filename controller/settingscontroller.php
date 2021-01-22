@@ -137,6 +137,35 @@ class SettingsController extends Controller {
     }
 
     /**
+     * Print personal config section
+     *
+     * @return TemplateResponse
+     */
+    public function personal() {
+        $data = [
+            "templateDir" => $this->config->GetPersonalTemplateDir()
+        ];
+        return new TemplateResponse($this->appName, "personal", $data, "blank");
+    }
+
+    /**
+     * Save personal settings
+     *
+     * @param string $personalTemplateDir - document template folder
+     * 
+     * @return array
+     * 
+     * @NoAdminRequired
+     */
+    public function SavePersonal($personalTemplateDir) {
+
+        $this->config->SetPersonalTemplateDir($personalTemplateDir);
+
+        return [
+            ];
+    }
+
+    /**
      * Save address settings
      *
      * @param string $documentserver - document service address

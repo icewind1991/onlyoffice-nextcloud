@@ -271,6 +271,13 @@ class AppConfig {
     public $_customization_autosave = "customization_autosave";
 
     /**
+     * The config key for the folder of personal template
+     *
+     * @var string
+     */
+    public $_personal_templateDir = "personal_templateDir";
+
+    /**
      * @param string $AppName - application name
      */
     public function __construct($AppName) {
@@ -1073,6 +1080,32 @@ class AppConfig {
         return $result;
     }
 
+    /**
+     * Save personal template folder
+     *
+     * @param string $value - path to folder template
+     */
+    public function SetPersonalTemplateDir($value) {
+        $userSession = \OC::$server->getUserSession();
+        if ($userSession !== null || $userSession->isLoggedIn()) {
+            $userId = $userSession->getUser()->getUID();
+            $this->config->setUserValue($userId, $this->appName, $this->_personal_templateDir, $value);
+        }
+    }
+
+    /**
+     * Get personal template folder
+     * 
+     * @return string
+     */
+    public function GetPersonalTemplateDir() {
+        $userSession = \OC::$server->getUserSession();
+        if ($userSession !== null || $userSession->isLoggedIn()) {
+            $userId = $userSession->getUser()->getUID();
+
+            return $this->config->getUserValue($userId, $this->appName, $this->_personal_templateDir);
+        }
+    }
 
     /**
      * Additional data about formats

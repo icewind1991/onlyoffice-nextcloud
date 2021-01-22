@@ -38,6 +38,7 @@ return [
        ["name" => "settings#get_settings", "url" => "/ajax/settings", "verb" => "GET"],
        ["name" => "settings#clear_history", "url" => "/ajax/settings/history", "verb" => "DELETE"],
        ["name" => "settings#add_template", "url" => "/ajax/settings/template", "verb" => "POST"],
+       ["name" => "settings#save_personal", "url" => "/ajax/settings/personal", "verb" => "PUT"],
     ],
     "ocs" => [
         ["name" => "federation#key", "url" => "/api/v1/key", "verb" => "POST"],
