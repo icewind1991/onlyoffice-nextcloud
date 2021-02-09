@@ -22,6 +22,8 @@ namespace OCA\Onlyoffice;
 use OCP\Files\Folder;
 use OCP\Files\File;
 
+use OCA\Onlyoffice\AppConfig;
+
 /**
  * Template manager
  *
@@ -65,6 +67,80 @@ class TemplateManager {
         $templateDir = $appDir->nodeExists("template") ? $appDir->get("template") : $appDir->newFolder("template");
 
         return $templateDir;
+    }
+
+    /**
+     * Get personal template directory
+     *
+     * @return Folder
+     */
+    public static function GetPersonalTemplateDir() {
+        $appConfig = new AppConfig("onlyoffice");
+        $templateValue = $appConfig->GetPersonalTemplateDir();
+        if (empty($templateValue)) {
+            return null;
+        }
+
+        $userId = \OC::$server->getUserSession()->getUser()->getUID();
+        $userFolder = \OC::$server->getRootFolder()->getUserFolder($userId);
+        $templateDir = $userFolder->get($templateValue);
+        if (!($templateDir instanceof Folder)) {
+            return null;
+        }
+
+        return $templateDir;
+    }
+
+    /**
+     * Get personal template list
+     * 
+     * @param string $template - mimetype of the template
+     *
+     * @return array
+     */
+    public static function GetPersonalTemplates($mimetype) {
+        $templates = [];
+        $templateDir = self::GetPersonalTemplateDir();
+        if (empty($templateDir)) {
+            return $templates;
+        }
+
+        $templateFiles = $templateDir->searchByMime($mimetype);
+        if (count($templateFiles) > 0) {
+            $templates = array_merge($templates, $templateFiles);
+        }
+
+        return $templates;
+    }
+
+    /**
+     * Get personal template
+     * 
+     * @param string $templateId - identifier of the template
+     *
+     * @return File
+     */
+    public static function GetPersonalTemplate($templateId) {
+        $logger = \OC::$server->getLogger();
+
+        $templateDir = self::GetPersonalTemplateDir();
+        if (empty($templateDir)) {
+            return null;
+        }
+
+        try {
+            $files = $templateDir->getById($templateId);
+        } catch (\Exception $e) {
+            $logger->logException($e, ["message" => "GetGlobalTemplate: $templateId", "app" => "onlyoffice"]);
+            return null;
+        }
+
+        if (empty($files)) {
+            $logger->info("Template not found: $templateId", ["app" => "onlyoffice"]);
+            return null;
+        }
+
+        return $files[0];
     }
 
     /**
