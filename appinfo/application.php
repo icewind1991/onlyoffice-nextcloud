@@ -28,6 +28,9 @@ use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\DirectEditing\RegisterDirectEditorEvent;
 use OCP\Util;
 use OCP\IPreview;
+use OCP\Files\Template\ITemplateManager;
+use OCP\Files\Template\TemplateFileCreator;
+use OCP\IL10N;
 
 use OCA\Viewer\Event\LoadViewer;
 
@@ -35,6 +38,7 @@ use OCA\Onlyoffice\AppConfig;
 use OCA\Onlyoffice\DirectEditor;
 use OCA\Onlyoffice\Hooks;
 use OCA\Onlyoffice\Preview;
+use OCA\Onlyoffice\TemplateProvider;
 
 class Application extends App implements IBootstrap {
 
@@ -54,6 +58,8 @@ class Application extends App implements IBootstrap {
     }
 
     public function register(IRegistrationContext $context): void {
+        $context->registerTemplateProvider(TemplateProvider::class);
+
         require_once __DIR__ . "/../3rdparty/jwt/BeforeValidException.php";
         require_once __DIR__ . "/../3rdparty/jwt/ExpiredException.php";
         require_once __DIR__ . "/../3rdparty/jwt/SignatureInvalidException.php";
@@ -122,6 +128,31 @@ class Application extends App implements IBootstrap {
             $previewManager = $container->query(IPreview::class);
             $previewManager->registerProvider(Preview::getMimeTypeRegex(), function() use ($container) {
                 return $container->query(Preview::class);
+            });
+        });
+
+        $context->injectFn(function(ITemplateManager $templateManager, $appName) {
+            $trans = $this->getContainer()->query(IL10N::class);
+            $templateManager->registerTemplateFileCreator(function () use ($appName, $trans) {
+                $docType = new TemplateFileCreator($appName, $trans->t("Document"), ".docx");
+                $docType->addMimetype("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+                $docType->setIconClass("icon-onlyoffice-new-docx");
+                $docType->setRatio(21/29.7);
+                return $docType;
+            });
+            $templateManager->registerTemplateFileCreator(function () use ($appName, $trans) {
+                $spredType = new TemplateFileCreator($appName, $trans->t("Spreadsheet"), ".xlsx");
+                $spredType->addMimetype("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                $spredType->setIconClass("icon-onlyoffice-new-xlsx");
+                $spredType->setRatio(21/29.7);
+                return $spredType;
+            });
+            $templateManager->registerTemplateFileCreator(function () use ($appName, $trans) {
+                $presType = new TemplateFileCreator($appName, $trans->t("Presentation"), ".pptx");
+                $presType->addMimetype("application/vnd.openxmlformats-officedocument.presentationml.presentation");
+                $presType->setIconClass("icon-onlyoffice-new-pptx");
+                $presType->setRatio(21/29.7);
+                return $presType;
             });
         });
 

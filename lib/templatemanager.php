@@ -20,6 +20,7 @@
 namespace OCA\Onlyoffice;
 
 use OCP\Files\Folder;
+use OCP\Files\File;
 
 /**
  * Template manager
@@ -64,6 +65,49 @@ class TemplateManager {
         $templateDir = $appDir->nodeExists("template") ? $appDir->get("template") : $appDir->newFolder("template");
 
         return $templateDir;
+    }
+
+    /**
+     * Get global template list
+     * 
+     * @param string $template - mimetype of the template
+     *
+     * @return array
+     */
+    public static function GetGlobalTemplates($mimetype) {
+        $templates = [];
+
+        $templateFiles = self::GetGlobalTemplateDir()->searchByMime($mimetype);
+        if (count($templateFiles) > 0) {
+            $templates = array_merge($templates, $templateFiles);
+        }
+
+        return $templates;
+    }
+
+    /**
+     * Get global template
+     * 
+     * @param string $templateId - identifier of the template
+     *
+     * @return File
+     */
+    public static function GetGlobalTemplate($templateId) {
+        $logger = \OC::$server->getLogger();
+
+        try {
+            $files = self::GetGlobalTemplateDir()->getById($templateId);
+        } catch (\Exception $e) {
+            $logger->logException($e, ["message" => "GetGlobalTemplate: $templateId", "app" => "onlyoffice"]);
+            return null;
+        }
+
+        if (empty($files)) {
+            $logger->info("Template not found: $templateId", ["app" => "onlyoffice"]);
+            return null;
+        }
+
+        return $files[0];
     }
 
     /**
