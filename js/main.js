@@ -27,45 +27,6 @@
 
     OCA.Onlyoffice.setting = {};
 
-    OCA.Onlyoffice.CreateFile = function (name, fileList) {
-        var dir = fileList.getCurrentDirectory();
-
-        if (!OCA.Onlyoffice.setting.sameTab || OCA.Onlyoffice.Desktop) {
-            $loaderUrl = OCA.Onlyoffice.Desktop ? "" : OC.generateUrl("apps/" + OCA.Onlyoffice.AppName + "/loader");
-            var winEditor = window.open($loaderUrl);
-        }
-
-        var createData = {
-            name: name,
-            dir: dir
-        };
-
-        if ($("#isPublic").val()) {
-            createData.shareToken = encodeURIComponent($("#sharingToken").val());
-        }
-
-        $.post(OC.generateUrl("apps/" + OCA.Onlyoffice.AppName + "/ajax/new"),
-            createData,
-            function onSuccess(response) {
-                if (response.error) {
-                    if (winEditor) {
-                        winEditor.close();
-                    }
-                    OCP.Toast.error(response.error);
-                    return;
-                }
-
-                fileList.add(response, { animate: true });
-                OCA.Onlyoffice.OpenEditor(response.id, dir, response.name, 0, winEditor);
-
-                OCA.Onlyoffice.context = { fileList: fileList };
-                OCA.Onlyoffice.context.fileName = response.name;
-
-                OCP.Toast.success(t(OCA.Onlyoffice.AppName, "File created"));
-            }
-        );
-    };
-
     OCA.Onlyoffice.OpenEditor = function (fileId, fileDir, fileName, version, winEditor) {
         var filePath = "";
         if (fileName) {
@@ -264,49 +225,6 @@
         }
     };
 
-    OCA.Onlyoffice.NewFileMenu = {
-        attach: function (menu) {
-            var fileList = menu.fileList;
-
-            if (fileList.id !== "files" && fileList.id !== "files.public") {
-                return;
-            }
-
-            menu.addMenuEntry({
-                id: "onlyofficeDocx",
-                displayName: t(OCA.Onlyoffice.AppName, "Document"),
-                templateName: t(OCA.Onlyoffice.AppName, "Document"),
-                iconClass: "icon-onlyoffice-new-docx",
-                fileType: "docx",
-                actionHandler: function (name) {
-                    OCA.Onlyoffice.CreateFile(name + ".docx", fileList);
-                }
-            });
-
-            menu.addMenuEntry({
-                id: "onlyofficeXlsx",
-                displayName: t(OCA.Onlyoffice.AppName, "Spreadsheet"),
-                templateName: t(OCA.Onlyoffice.AppName, "Spreadsheet"),
-                iconClass: "icon-onlyoffice-new-xlsx",
-                fileType: "xlsx",
-                actionHandler: function (name) {
-                    OCA.Onlyoffice.CreateFile(name + ".xlsx", fileList);
-                }
-            });
-
-            menu.addMenuEntry({
-                id: "onlyofficePpts",
-                displayName: t(OCA.Onlyoffice.AppName, "Presentation"),
-                templateName: t(OCA.Onlyoffice.AppName, "Presentation"),
-                iconClass: "icon-onlyoffice-new-pptx",
-                fileType: "pptx",
-                actionHandler: function (name) {
-                    OCA.Onlyoffice.CreateFile(name + ".pptx", fileList);
-                }
-            });
-        }
-    };
-
     var getFileExtension = function (fileName) {
         var extension = fileName.substr(fileName.lastIndexOf(".") + 1).toLowerCase();
         return extension;
@@ -377,7 +295,6 @@
             OCA.Onlyoffice.GetSettings(initSharedButton);
         } else {
             OC.Plugins.register("OCA.Files.FileList", OCA.Onlyoffice.FileList);
-            OC.Plugins.register("OCA.Files.NewFileMenu", OCA.Onlyoffice.NewFileMenu);
 
             OCA.Onlyoffice.bindVersionClick();
         }
