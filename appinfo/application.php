@@ -30,6 +30,7 @@ use OCP\Util;
 use OCP\IPreview;
 use OCP\Files\Template\ITemplateManager;
 use OCP\Files\Template\TemplateFileCreator;
+use OCP\Files\Template\FileCreatedFromTemplateEvent;
 use OCP\IL10N;
 
 use OCA\Viewer\Event\LoadViewer;
@@ -39,6 +40,7 @@ use OCA\Onlyoffice\DirectEditor;
 use OCA\Onlyoffice\Hooks;
 use OCA\Onlyoffice\Preview;
 use OCA\Onlyoffice\TemplateProvider;
+use OCA\Onlyoffice\TemplateManager;
 
 class Application extends App implements IBootstrap {
 
@@ -122,6 +124,16 @@ class Application extends App implements IBootstrap {
                     && $this->appConfig->SettingsAreSuccessful()) {
                     $editor = $container->query(DirectEditor::class);
                     $event->register($editor);
+                }
+            });
+
+            $eventDispatcher->addListener(FileCreatedFromTemplateEvent::class,
+            function (FileCreatedFromTemplateEvent $event) use ($container) {
+                $template = $event->getTemplate();
+                if ($template === null) {
+                    $targetFile = $event->getTarget();
+                    $templateEmpty = TemplateManager::GetTemplate($targetFile->getName());
+                    $targetFile->putContent($templateEmpty);
                 }
             });
 
